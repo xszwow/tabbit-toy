@@ -1,0 +1,28 @@
+name: tmp-gologin-download
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download GoLogin XAPK
+        run: |
+          set -euxo pipefail
+          curl -L --fail --retry 3 --retry-delay 2 \
+            'https://d.apkpure.net/b/XAPK/com.gologin.gologin_mobile?version=latest' \
+            -o GoLogin-latest.xapk
+          ls -lh GoLogin-latest.xapk
+          sha256sum GoLogin-latest.xapk | tee SHA256SUMS.txt
+          file GoLogin-latest.xapk
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gologin-xapk
+          path: |
+            GoLogin-latest.xapk
+            SHA256SUMS.txt
+          retention-days: 1
